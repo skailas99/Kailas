@@ -14,7 +14,21 @@ const systemFilters = [
   "Homeopathy",
 ];
 
-const buildFilterOptions = (items) => ["All", ...items];
+const tourThemes = {
+  "Digestive Health": ["Digestion", "Digestive support", "Gut support"],
+  Immunity: ["Immune support", "Cold relief", "Respiratory support"],
+  "Skin Care": ["Skin care", "Wound", "Inflammation"],
+  "Stress & Sleep": ["Stress", "Sleep support", "Calmness"],
+};
+
+const loadFromStorage = (key, fallback) => {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch (_error) {
+    return fallback;
+  }
+};
 
 const App = () => {
   const [plants, setPlants] = useState([]);
@@ -22,6 +36,11 @@ const App = () => {
   const [activeFilter, setActiveFilter] = useState("All");
   const [activeDosageForm, setActiveDosageForm] = useState("All");
   const [activeRegion, setActiveRegion] = useState("All");
+  const [activeUse, setActiveUse] = useState("All");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeTourTheme, setActiveTourTheme] = useState("Digestive Health");
+  const [bookmarks, setBookmarks] = useState(() => loadFromStorage("vhg-bookmarks", []));
+  const [notesByPlant, setNotesByPlant] = useState(() => loadFromStorage("vhg-notes", {}));
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -43,21 +62,20 @@ const App = () => {
     loadPlants();
   }, []);
 
+  useEffect(() => {
+    localStorage.setItem("vhg-bookmarks", JSON.stringify(bookmarks));
+  }, [bookmarks]);
 
-  const filteredPlants = useMemo(() => {
-    if (activeFilter === "All") {
-      return plants;
-    }
-
-    return plants.filter((plant) => plant.ayush_system === activeFilter);
-  }, [activeFilter, plants]);
+  useEffect(() => {
+    localStorage.setItem("vhg-notes", JSON.stringify(notesByPlant));
+  }, [notesByPlant]);
 
   const dosageFormOptions = useMemo(() => {
     const forms = new Set();
     plants.forEach((plant) => {
       plant.dosage_form?.forEach((form) => forms.add(form));
     });
-    return buildFilterOptions([...forms].sort());
+    return ["All", ...Array.from(forms).sort()];
   }, [plants]);
 
   const regionOptions = useMemo(() => {
@@ -67,45 +85,109 @@ const App = () => {
         regions.add(plant.region);
       }
     });
-    return buildFilterOptions([...regions].sort());
+    return ["All", ...Array.from(regions).sort()];
+  }, [plants]);
+
+  const useOptions = useMemo(() => {
+    const uses = new Set();
+    plants.forEach((plant) => {
+      plant.medicinal_uses?.forEach((item) => uses.add(item));
+    });
+    return ["All", ...Array.from(uses).sort()];
   }, [plants]);
 
   const fullyFilteredPlants = useMemo(() => {
-    return filteredPlants.filter((plant) => {
+    return plants.filter((plant) => {
+      const matchesSystem =
+        activeFilter === "All" || plant.ayush_system === activeFilter;
       const matchesDosage =
         activeDosageForm === "All" ||
         plant.dosage_form?.includes(activeDosageForm);
-      const matchesRegion =
-        activeRegion === "All" || plant.region === activeRegion;
+      const matchesRegion = activeRegion === "All" || plant.region === activeRegion;
+      const matchesUse =
+        activeUse === "All" || plant.medicinal_uses?.includes(activeUse);
+      const query = searchTerm.trim().toLowerCase();
+      const matchesSearch =
+        query.length === 0 ||
+        [
+          plant.common_name,
+          plant.botanical_name,
+          ...(plant.common_names || []),
+          ...(plant.medicinal_uses || []),
+          plant.habitat,
+        ]
+          .join(" ")
+          .toLowerCase()
+          .includes(query);
 
-      return matchesDosage && matchesRegion;
+      return (
+        matchesSystem &&
+        matchesDosage &&
+        matchesRegion &&
+        matchesUse &&
+        matchesSearch
+      );
     });
-  }, [activeDosageForm, activeRegion, filteredPlants]);
+  }, [
+    activeDosageForm,
+    activeFilter,
+    activeRegion,
+    activeUse,
+    plants,
+    searchTerm,
+  ]);
 
   useEffect(() => {
     const isSelectedVisible = fullyFilteredPlants.some(
       (plant) => plant._id === selectedPlant?._id
     );
 
-    if (
-      (!selectedPlant || !isSelectedVisible) &&
-      fullyFilteredPlants.length > 0
-    ) {
+    if ((!selectedPlant || !isSelectedVisible) && fullyFilteredPlants.length > 0) {
       setSelectedPlant(fullyFilteredPlants[0]);
     }
   }, [fullyFilteredPlants, selectedPlant]);
+
+  const activeTourPlants = useMemo(() => {
+    const keywords = tourThemes[activeTourTheme] || [];
+    return plants.filter((plant) =>
+      plant.medicinal_uses?.some((item) => keywords.some((keyword) => item.includes(keyword)))
+    );
+  }, [activeTourTheme, plants]);
+
+  const toggleBookmark = (plantId) => {
+    setBookmarks((current) =>
+      current.includes(plantId)
+        ? current.filter((id) => id !== plantId)
+        : [...current, plantId]
+    );
+  };
+
+  const saveNote = (plantId, note) => {
+    setNotesByPlant((current) => ({ ...current, [plantId]: note }));
+  };
 
   return (
     <div className="app">
       <header className="hero">
         <div>
           <p className="eyebrow">Virtual Herbal Garden (AYUSH)</p>
-          <h1>Explore medicinal plants across AYUSH systems.</h1>
+          <h1>Explore medicinal plants through an interactive digital garden.</h1>
           <p className="subtitle">
-            Discover plant profiles, traditional uses, and ask the herbal
-            assistant for educational guidance.
+            Rotate 3D-style plant cards, watch multimedia, join guided tours, and
+            build your personal herbal notebook.
           </p>
         </div>
+
+        <div className="search-row">
+          <input
+            type="search"
+            placeholder="Search by name, use, habitat..."
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+          />
+          <p>{fullyFilteredPlants.length} plants found</p>
+        </div>
+
         <div className="filters">
           {systemFilters.map((filter) => (
             <button
@@ -118,6 +200,7 @@ const App = () => {
             </button>
           ))}
         </div>
+
         <div className="filter-row">
           <label>
             Dosage form
@@ -145,8 +228,37 @@ const App = () => {
               ))}
             </select>
           </label>
+          <label>
+            Medicinal use
+            <select value={activeUse} onChange={(event) => setActiveUse(event.target.value)}>
+              {useOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
       </header>
+
+      <section className="panel tour-panel">
+        <h2>Guided virtual tours</h2>
+        <div className="tour-controls">
+          {Object.keys(tourThemes).map((theme) => (
+            <button
+              key={theme}
+              type="button"
+              className={activeTourTheme === theme ? "active" : ""}
+              onClick={() => setActiveTourTheme(theme)}
+            >
+              {theme}
+            </button>
+          ))}
+        </div>
+        <p>
+          Theme plants: {activeTourPlants.map((plant) => plant.common_name).join(", ") || "No matches yet"}
+        </p>
+      </section>
 
       <main className="layout">
         <section className="panel">
@@ -160,13 +272,20 @@ const App = () => {
               plants={fullyFilteredPlants}
               selectedPlant={selectedPlant}
               onSelect={setSelectedPlant}
+              bookmarks={bookmarks}
             />
           )}
         </section>
 
         <section className="panel">
           <h2>Plant details</h2>
-          <PlantDetail plant={selectedPlant} />
+          <PlantDetail
+            plant={selectedPlant}
+            isBookmarked={bookmarks.includes(selectedPlant?._id)}
+            onToggleBookmark={toggleBookmark}
+            note={notesByPlant[selectedPlant?._id] || ""}
+            onSaveNote={saveNote}
+          />
         </section>
 
         <section className="panel">

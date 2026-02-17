@@ -1,6 +1,6 @@
-const PlantList = ({ plants, selectedPlant, onSelect }) => {
+const PlantList = ({ plants, selectedPlant, onSelect, bookmarks }) => {
   if (plants.length === 0) {
-    return <p>No plants available for this system.</p>;
+    return <p>No plants available for this filter selection.</p>;
   }
 
   return (
@@ -14,6 +14,7 @@ const PlantList = ({ plants, selectedPlant, onSelect }) => {
           >
             <span>{plant.common_name}</span>
             <small>{plant.ayush_system}</small>
+            {bookmarks.includes(plant._id) && <small>★ Bookmarked</small>}
           </button>
         </li>
       ))}
