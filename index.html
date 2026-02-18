@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Virtual Herbal Garden | AYUSH Medicinal Plants</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <nav class="top-nav">
+      <div class="logo">Virtual Herbal Garden</div>
+      <div class="nav-links">
+        <a href="#garden">Garden</a>
+        <a href="#map">Habitat Map</a>
+        <a href="#paths">Learning Paths</a>
+        <a href="#rituals">Rituals</a>
+        <a href="#quiz">Quiz</a>
+      </div>
+      <button class="glow-button" id="audioToggle" aria-pressed="false">Ambient Mode: Off</button>
+    </nav>
+    <div class="hero-content">
+      <div>
+        <p class="eyebrow">AYUSH • Ayurveda • Yoga & Naturopathy • Unani • Siddha • Homeopathy</p>
+        <h1>Explore India’s living pharmacy in an immersive, interactive garden.</h1>
+        <p class="lead">
+          Wander through curated herbal habitats, discover traditional formulations, and learn sustainable care
+          practices rooted in AYUSH systems.
+        </p>
+        <div class="hero-actions">
+          <button class="glow-button" id="startTour">Start Guided Tour</button>
+          <button class="ghost-button" id="openAtlas">Open Plant Atlas</button>
+        </div>
+      </div>
+      <div class="hero-card">
+        <h2>Garden Status</h2>
+        <ul>
+          <li><span>Biome</span><strong>Monsoon Forest</strong></li>
+          <li><span>Season</span><strong>Sharad (Autumn)</strong></li>
+          <li><span>Herbal Beds</span><strong>24 thriving</strong></li>
+          <li><span>Daily Ritual</span><strong>Tulsi sunrise misting</strong></li>
+        </ul>
+        <div class="featured-plant">
+          <span class="tag">Plant of the Day</span>
+          <h3>Amalaki (Indian Gooseberry)</h3>
+          <p>Rich in vitamin C and revered for rejuvenation in Ayurveda.</p>
+        </div>
+        <div class="status-progress">
+          <span>Wellness Balance</span>
+          <div class="progress-bar">
+            <div class="progress" style="width: 82%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="garden" class="section">
+      <div class="section-header">
+        <div>
+          <h2>Interactive Herbal Garden</h2>
+          <p>Filter by AYUSH system and explore key medicinal plants, their actions, and cautions.</p>
+        </div>
+        <div class="controls">
+          <input type="search" id="searchInput" placeholder="Search plant, action, or region" />
+          <div class="filter-group" id="filterGroup"></div>
+        </div>
+      </div>
+      <div class="garden-grid" id="gardenGrid"></div>
+    </section>
+
+    <section id="map" class="section section-alt">
+      <div class="section-header">
+        <div>
+          <h2>Living Habitat Map</h2>
+          <p>Navigate ecological zones and discover how climate shapes herbal wisdom.</p>
+        </div>
+      </div>
+      <div class="map-layout">
+        <div class="zone-grid" id="zoneGrid"></div>
+        <div class="zone-details" id="zoneDetails"></div>
+      </div>
+    </section>
+
+    <section id="paths" class="section section-alt">
+      <div class="section-header">
+        <div>
+          <h2>Learning Paths</h2>
+          <p>Follow guided trails aligned to the five AYUSH systems.</p>
+        </div>
+      </div>
+      <div class="path-grid">
+        <article>
+          <h3>Ayurveda Harmony Trail</h3>
+          <p>Balance Vata, Pitta, Kapha with warming herbs, oils, and mindful routines.</p>
+          <ul>
+            <li>Ashwagandha for resilience</li>
+            <li>Turmeric for digestive fire</li>
+            <li>Triphala for daily detox</li>
+          </ul>
+        </article>
+        <article>
+          <h3>Yoga & Naturopathy Vitality Loop</h3>
+          <p>Integrate breathwork, hydrotherapy, and adaptogenic plants for vitality.</p>
+          <ul>
+            <li>Brahmi for clarity</li>
+            <li>Lemongrass for circulation</li>
+            <li>Ginger for metabolic boost</li>
+          </ul>
+        </article>
+        <article>
+          <h3>Unani Balance Walk</h3>
+          <p>Explore the four humors with cooling botanicals and aromatic tonics.</p>
+          <ul>
+            <li>Rosa damascena for calm</li>
+            <li>Ajwain for digestion</li>
+            <li>Jatamansi for sleep</li>
+          </ul>
+        </article>
+        <article>
+          <h3>Siddha Elemental Circuit</h3>
+          <p>Connect with the five elements using potent South Indian herbs.</p>
+          <ul>
+            <li>Nilavembu for seasonal care</li>
+            <li>Neem for purification</li>
+            <li>Thuthuvalai for respiratory support</li>
+          </ul>
+        </article>
+        <article>
+          <h3>Homeopathy Observation Route</h3>
+          <p>Learn signatures, preparation, and symptom matching through gentle botanicals.</p>
+          <ul>
+            <li>Arnica for recovery</li>
+            <li>Calendula for skin</li>
+            <li>Belladonna for acute flare-ups</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="rituals" class="section">
+      <div class="section-header">
+        <div>
+          <h2>Immersive Rituals & Practices</h2>
+          <p>Experience daily routines inspired by AYUSH traditions.</p>
+        </div>
+      </div>
+      <div class="ritual-grid">
+        <div class="ritual-card">
+          <h3>Dawn Pranayama + Herbal Steam</h3>
+          <p>Follow the audio-guided breathing session while the garden releases basil and mint steam.</p>
+          <button class="ghost-button" data-ritual="steam">Begin Ritual</button>
+        </div>
+        <div class="ritual-card">
+          <h3>Midday Digestive Tonic</h3>
+          <p>Blend coriander, fennel, and cumin in an interactive mortar to learn ratios.</p>
+          <button class="ghost-button" data-ritual="tonic">Mix Tonic</button>
+        </div>
+        <div class="ritual-card">
+          <h3>Moonlight Recovery Garden</h3>
+          <p>Dim the landscape and illuminate calming herbs for restorative sleep rituals.</p>
+          <button class="ghost-button" data-ritual="moon">Enter Moonlight Mode</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="quiz" class="section section-alt">
+      <div class="section-header">
+        <div>
+          <h2>Herbal Knowledge Quiz</h2>
+          <p>Test your knowledge and unlock new virtual seeds.</p>
+        </div>
+      </div>
+      <div class="quiz-card">
+        <div id="quizQuestion"></div>
+        <div class="quiz-options" id="quizOptions"></div>
+        <div class="quiz-feedback" id="quizFeedback"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Created for educational purposes. Always consult qualified practitioners for medical advice.</p>
+  </footer>
+
+  <div class="modal" id="plantModal" aria-hidden="true" role="dialog">
+    <div class="modal-content">
+      <button class="modal-close" id="closeModal">×</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
